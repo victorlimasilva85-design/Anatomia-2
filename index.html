@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Atlas de Anatomia Humana</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <div id="authScreen">
+    <header class="topbar">
+      <div class="left-top">
+        <button class="btn btn-secondary mobile-only" type="button" onclick="toggleSidebar()">☰</button>
+        <div>
+          <div class="brand">🧠 Atlas de Anatomia Humana</div>
+          <div class="small">Portal acadêmico de estudos</div>
+        </div>
+      </div>
+    </header>
+
+    <main class="auth-wrap">
+      <section class="auth-card premium-card">
+        <h1>Bem-vindo</h1>
+        <p class="small center">Sistema de estudos em Anatomia Humana</p>
+        <img id="imgLogin" class="login-image" src="https://upload.wikimedia.org/wikipedia/commons/8/8e/Skeleton_front.svg" alt="Anatomia" />
+
+        <input class="input" id="loginMatricula" placeholder="Digite sua matrícula" />
+        <button class="btn btn-primary full" onclick="loginByMatricula()">Entrar</button>
+
+        <div class="stack gap-sm top-gap">
+          <button class="btn btn-secondary full" onclick="showForgot()">Esqueci a senha</button>
+          <button class="btn btn-success full" onclick="toggleCadastro()">Cadastrar</button>
+          <button class="btn btn-warning full" onclick="showAdminLogin()">Painel</button>
+        </div>
+
+        <div id="loginMsg"></div>
+      </section>
+
+      <section class="auth-card premium-card hidden" id="cadastroCard">
+        <h2>Cadastro</h2>
+        <input class="input" id="regFirstName" placeholder="Primeiro nome" />
+        <input class="input" id="regName" placeholder="Nome completo" />
+        <input class="input" id="regMatricula" maxlength="7" placeholder="Matrícula" />
+        <input class="input" id="regEmail" placeholder="E-mail institucional" />
+        <input class="input" id="regInstitutionEmail" placeholder="E-mail da instituição" />
+        <input class="input" id="regPass" type="password" maxlength="7" placeholder="Senha (7 caracteres)" />
+        <button class="btn btn-success full" onclick="register()">Enviar cadastro</button>
+        <div id="regMsg"></div>
+        <div class="status-box warn top-gap">Após o envio, o cadastro ficará disponível em até 24 horas, salvo se o painel liberar acesso rápido.</div>
+        <button class="btn btn-secondary full top-gap" onclick="toggleCadastro()">Voltar</button>
+      </section>
+    </main>
+  </div>
+
+  <div id="adminLoginModal" class="modal hidden">
+    <div class="modal-card">
+      <h2>Entrar no painel</h2>
+      <input class="input" id="adminPass" type="password" placeholder="Digite a senha do painel" />
+      <div class="row">
+        <button class="btn btn-primary" onclick="adminLogin()">Entrar</button>
+        <button class="btn btn-secondary" onclick="hideAdminLogin()">Fechar</button>
+      </div>
+      <div id="adminMsg"></div>
+      <div class="small top-gap">Senha do painel: <b>bi.por72</b></div>
+    </div>
+  </div>
+
+  <div id="forgotModal" class="modal hidden">
+    <div class="modal-card wide">
+      <h2>Esqueci a senha</h2>
+      <p class="small">Digite seu e-mail institucional, faça a verificação e depois altere sua senha.</p>
+      <div id="forgotStep1">
+        <input class="input" id="forgotUser" placeholder="Digite seu e-mail institucional" />
+        <div class="row">
+          <button class="btn btn-primary" onclick="startForgotVerification()">Continuar</button>
+          <button class="btn btn-secondary" onclick="hideForgot()">Fechar</button>
+        </div>
+      </div>
+      <div id="forgotStep2" class="hidden top-gap">
+        <p class="small">Verificação: selecione a imagem correta para provar que você não é robô.</p>
+        <div class="grid grid-2" id="robotGrid"></div>
+        <div id="forgotVerifyMsg"></div>
+      </div>
+      <div id="forgotStep3" class="hidden top-gap">
+        <input class="input" id="newForgotPass" type="password" maxlength="7" placeholder="Nova senha (7 caracteres)" />
+        <button class="btn btn-success top-gap" onclick="saveNewPassword()">Alterar senha</button>
+      </div>
+      <div id="forgotMsg"></div>
+    </div>
+  </div>
+
+  <div id="adminScreen" class="hidden">
+    <header class="topbar">
+      <div class="brand">🔐 Painel administrativo</div>
+      <div class="row wrap">
+        <button class="btn btn-secondary" onclick="renderAdmin()">Atualizar</button>
+        <button class="btn btn-danger" onclick="closeAdmin()">Sair do painel</button>
+      </div>
+    </header>
+
+    <main class="content admin-content">
+      <div class="grid grid-3">
+        <div class="mini-stat status-card-pending"><span class="small">Pendentes</span><strong id="adminPendingCount">0</strong></div>
+        <div class="mini-stat status-card-approved"><span class="small">Aprovados</span><strong id="adminApprovedCount">0</strong></div>
+        <div class="mini-stat status-card-rejected"><span class="small">Recusados</span><strong id="adminRejectedCount">0</strong></div>
+      </div>
+
+      <section class="card top-gap-lg">
+        <h2>Verificação de matrícula</h2>
+        <div class="row wrap">
+          <input class="input max-320" id="lookupMatricula" placeholder="Digite a matrícula" />
+          <button class="btn btn-primary" onclick="consultMatricula()">Consultar</button>
+        </div>
+        <div id="matriculaStatus"></div>
+      </section>
+
+      <div class="tab-row top-gap-lg">
+        <button class="tab-btn active" onclick="adminTab('pending', this)">Pendente</button>
+        <button class="tab-btn" onclick="adminTab('approved', this)">Aprovado</button>
+        <button class="tab-btn" onclick="adminTab('rejected', this)">Recusado</button>
+      </div>
+
+      <div id="adminPending"></div>
+      <div id="adminApproved" class="hidden"></div>
+      <div id="adminRejected" class="hidden"></div>
+    </main>
+  </div>
+
+  <div id="appScreen" class="hidden">
+    <header class="topbar">
+      <div class="left-top">
+        <button class="btn btn-secondary mobile-only" type="button" onclick="toggleSidebar()">☰</button>
+        <div>
+          <div class="brand">🧠 Atlas de Anatomia Humana</div>
+          <div class="small">Versão profissional</div>
+        </div>
+      </div>
+      <div class="row wrap">
+        <span class="badge" id="userBadge">Aluno</span>
+        <button class="btn btn-danger" onclick="logout()">Sair</button>
+      </div>
+    </header>
+
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar">
+        <div class="nav-title">Navegação</div>
+        <button class="nav-btn active" id="nav-dashboard" onclick="setPage('dashboard')">🏠 Dashboard</button>
+        <button class="nav-btn" id="nav-overview" onclick="setPage('overview')">✨ Visão geral</button>
+        <button class="nav-btn" id="nav-atlas" onclick="setPage('atlas')">🦴 Atlas do esqueleto</button>
+        <button class="nav-btn" id="nav-systems" onclick="setPage('systems')">🫀 Sistemas do corpo</button>
+        <button class="nav-btn" id="nav-topics" onclick="setPage('topics')">📚 Tópicos por tema</button>
+        <button class="nav-btn" id="nav-flashcards" onclick="setPage('flashcards')">🃏 Flashcards</button>
+        <button class="nav-btn" id="nav-practice" onclick="setPage('practice')">📝 Questões por tema</button>
+        <button class="nav-btn" id="nav-game" onclick="setPage('game')">🎮 Modo jogo</button>
+        <button class="nav-btn" id="nav-simulado" onclick="setPage('simulado')">⏱️ Simulado inteligente</button>
+        <button class="nav-btn" id="nav-ranking" onclick="setPage('ranking')">🏆 Ranking</button>
+
+        <div class="nav-title top-gap-lg">Seu progresso</div>
+        <div class="card compact-card">
+          <div class="small">Pontuação do último simulado</div>
+          <div class="score-big" id="sidePoints">0</div>
+          <div class="small top-gap">Aproveitamento</div>
+          <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+          <div class="small top-gap" id="progressText">0%</div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <section id="page-dashboard" class="page active">
+          <div class="hero">
+            <div>
+              <h1 id="welcomeTitle">Bem-vindo</h1>
+              <p>Estude por sistema, revise com flashcards, pratique por tema, jogue no modo associação e faça simulados com tempo e ranking.</p>
+              <div class="top-gap">
+                <span class="pill">Atlas completo</span>
+                <span class="pill">Questões inteligentes</span>
+                <span class="pill">Ranking</span>
+                <span class="pill">Painel administrativo</span>
+              </div>
+            </div>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/8/8e/Skeleton_front.svg" alt="Esqueleto" />
+          </div>
+          <h2 class="section-title">Resumo do ambiente</h2>
+          <div class="grid grid-4">
+            <div class="mini-stat"><span class="small">Sistemas</span><strong id="statSystems">0</strong></div>
+            <div class="mini-stat"><span class="small">Tópicos</span><strong id="statTopics">0</strong></div>
+            <div class="mini-stat"><span class="small">Flashcards</span><strong id="statFlash">0</strong></div>
+            <div class="mini-stat"><span class="small">Questões</span><strong id="statQuestions">0</strong></div>
+          </div>
+        </section>
+
+        <section id="page-overview" class="page">
+          <h2 class="section-title">Visão geral da plataforma</h2>
+          <div class="grid grid-4" id="overviewContainer"></div>
+        </section>
+
+        <section id="page-atlas" class="page">
+          <h2 class="section-title">Atlas completo do esqueleto humano</h2>
+          <div class="row wrap">
+            <input class="input max-360" id="searchAtlas" placeholder="Pesquisar osso, região ou estrutura" oninput="renderAtlas()" />
+          </div>
+          <div class="grid grid-2 top-gap" id="atlasContainer"></div>
+        </section>
+
+        <section id="page-systems" class="page">
+          <h2 class="section-title">Sistemas do corpo humano</h2>
+          <div class="tab-row" id="systemTabs"></div>
+          <div class="grid grid-3 top-gap" id="systemsContainer"></div>
+        </section>
+
+        <section id="page-topics" class="page">
+          <h2 class="section-title">Tópicos por tema</h2>
+          <div class="grid grid-3" id="topicsContainer"></div>
+        </section>
+
+        <section id="page-flashcards" class="page">
+          <h2 class="section-title">Flashcards</h2>
+          <p class="small">Toque no card para virar.</p>
+          <div class="flash-grid" id="flashcardsContainer"></div>
+        </section>
+
+        <section id="page-practice" class="page">
+          <h2 class="section-title">Questões por tema</h2>
+          <select id="practiceTheme" class="input max-320" onchange="renderPracticeBank()"></select>
+          <div class="grid grid-2 top-gap" id="practiceContainer"></div>
+        </section>
+
+        <section id="page-game" class="page">
+          <h2 class="section-title">Modo jogo anatômico</h2>
+          <div class="row wrap">
+            <button class="btn btn-violet" onclick="startMatchGame()">Gerar jogo</button>
+            <button class="btn btn-secondary" onclick="checkMatchGame()">Verificar</button>
+            <button class="btn btn-warning" onclick="startMatchGame()">Novo jogo</button>
+          </div>
+          <div id="gameMsg"></div>
+          <div class="game-grid top-gap">
+            <div class="game-box">
+              <h3>Nomes</h3>
+              <div id="matchNames"></div>
+            </div>
+            <div class="game-box">
+              <h3>Funções / regiões</h3>
+              <div id="matchDrops"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="page-simulado" class="page">
+          <div class="card">
+            <div class="grid grid-3">
+              <div class="mini-stat"><span class="small">Tempo</span><strong id="simTime">15:00</strong></div>
+              <div class="mini-stat"><span class="small">Questão</span><strong><span id="simCurrent">0</span>/<span id="simTotal">0</span></strong></div>
+              <div class="mini-stat"><span class="small">Pontos</span><strong id="simPoints">0</strong></div>
+            </div>
+            <h2 class="top-gap-lg">Simulado inteligente</h2>
+            <div class="row wrap">
+              <select id="simTheme" class="input max-320"></select>
+              <select id="simCount" class="input max-200">
+                <option value="5">5 questões</option>
+                <option value="8">8 questões</option>
+                <option value="10">10 questões</option>
+              </select>
+            </div>
+            <div class="row wrap top-gap">
+              <button class="btn btn-primary" onclick="startSimulado()">Iniciar simulado</button>
+              <button class="btn btn-secondary" onclick="resetSimulado()">Reiniciar</button>
+            </div>
+            <div id="simuladoArea" class="top-gap"></div>
+          </div>
+        </section>
+
+        <section id="page-ranking" class="page">
+          <div class="card">
+            <h2>Ranking dos alunos</h2>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Posição</th><th>Nome</th><th>Matrícula</th><th>Pontos</th><th>Tema</th><th>Data</th></tr>
+                </thead>
+                <tbody id="rankingBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <nav class="mobile-bottom-nav">
+      <button onclick="setPage('dashboard')">Início</button>
+      <button onclick="setPage('atlas')">Atlas</button>
+      <button onclick="setPage('systems')">Sistemas</button>
+      <button onclick="setPage('simulado')">Simulado</button>
+      <button onclick="setPage('ranking')">Ranking</button>
+    </nav>
+  </div>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
